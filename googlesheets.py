@@ -53,7 +53,7 @@ def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
                             discoveryServiceUrl=discoveryUrl)
 
     spreadsheetId = '1N8KaYe7a3VLcbPz3VLwdMeUXcq5GR3fLlqPGj4NbMoE'
-    range_name = 'Day2!A:C'
+    range_name = 'Day3!A:C'
 
     values = [
         [
