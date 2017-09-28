@@ -71,7 +71,7 @@ def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
         spreadsheetId=spreadsheetId, range=range_name,
         valueInputOption='USER_ENTERED', body=body).execute()
     except errors.HttpError as err:
-        print("Error when writing to sheet {}, retrying after 30s".format(err.))
+        print("Error when writing to sheet {}, retrying after 30s".format(err))
         sleep(30)
         write_to_sheet(myScore,oppScore,current_time,usOnline,oppOnline)
         
