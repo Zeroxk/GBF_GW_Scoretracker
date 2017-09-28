@@ -23,7 +23,7 @@ def main():
     GBF_URL = 'http://game.granbluefantasy.jp/'
     GW_HOME_URL = GBF_URL + '#event/teamraid033'
     myGuildID = '147448'
-    oppGuildID = '654678'
+    oppGuildID = '137217'
     driver.get(GBF_URL)
 
     '''user logs in'''
@@ -36,6 +36,7 @@ def main():
     end = datetime.now(jst).replace(hour=0, minute=0, second=0)
     
     now = datetime.now(jst)
+    refreshInterval = 600
     
     while now.hour > end.hour and now.hour >= start.hour:
         myScore = driver.find_element_by_class_name('txt-guild-point').text.replace(',','')
@@ -49,10 +50,9 @@ def main():
         print('Current time: {}'.format(now.time()) )
         googlesheets.write_to_sheet(int(myScore), int(oppScore), now.strftime('%H:%M:%S'), usOnline, oppOnline)
 
-        refreshInterval = 600
         sleep(refreshInterval)
-        driver.refresh()
         now = datetime.now(jst)
+        driver.refresh()
 
 if __name__ == '__main__':
     try:
