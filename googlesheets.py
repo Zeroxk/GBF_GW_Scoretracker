@@ -2,10 +2,11 @@ from __future__ import print_function
 import httplib2
 import os
 
-from apiclient import discovery
+from googleapiclient import discovery,errors
 from oauth2client import client
 from oauth2client import tools
 from oauth2client.file import Storage
+from time import sleep
 
 try:
     import argparse
@@ -53,7 +54,7 @@ def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
                             discoveryServiceUrl=discoveryUrl)
 
     spreadsheetId = '1N8KaYe7a3VLcbPz3VLwdMeUXcq5GR3fLlqPGj4NbMoE'
-    range_name = 'Day3!A:C'
+    range_name = 'Day5!A:C'
 
     values = [
         [
@@ -65,9 +66,17 @@ def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
         'values': values
     }
 
-    result = service.spreadsheets().values().append(
+    try:
+        result = service.spreadsheets().values().append(
         spreadsheetId=spreadsheetId, range=range_name,
         valueInputOption='USER_ENTERED', body=body).execute()
+    except errors.HttpError as err:
+        print("Error when writing to sheet {}, retrying after 30s".format(err.))
+        sleep(30)
+        write_to_sheet(myScore,oppScore,current_time,usOnline,oppOnline)
+        
+
+    
 
 def main():
     write_to_sheet(100, 99, '01:02:03', 3, 4)
