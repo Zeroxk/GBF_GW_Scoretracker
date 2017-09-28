@@ -16,7 +16,7 @@ except ImportError:
 
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE = 'client_secret.json'
-APPLICATION_NAME = 'GW matchscore tracker'
+APPLICATION_NAME = 'Gbf-gw-scoretracker'
 
 
 def get_credentials():
@@ -33,7 +33,7 @@ def get_credentials():
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir,
-                                   'gw.matchscore.tracker.json')
+                                   'gw.scoretracker.json')
 
     store = Storage(credential_path)
     credentials = store.get()
