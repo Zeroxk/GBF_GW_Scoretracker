@@ -18,7 +18,6 @@ SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Gbf-gw-scoretracker'
 
-
 def get_credentials():
     """Gets valid user credentials from storage.
 
@@ -45,22 +44,20 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
+def setup(spreadsheetId):
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
                     'version=v4')
+    global service
     service = discovery.build('sheets', 'v4', http=http,
                             discoveryServiceUrl=discoveryUrl)
+    global SPREADSHEET_ID
+    SPREADSHEET_ID = spreadsheetId
 
-    spreadsheetId = '1N8KaYe7a3VLcbPz3VLwdMeUXcq5GR3fLlqPGj4NbMoE'
-    range_name = 'Day5!A:C'
-
-    values = [
-        [
-            current_time, myScore, oppScore
-        ]
-    ]
+def write_to_sheet(values, ranges):
+    
+    range_name = ranges
     
     body = {
         'values': values
@@ -68,18 +65,23 @@ def write_to_sheet(myScore, oppScore, current_time, usOnline, oppOnline):
 
     try:
         result = service.spreadsheets().values().append(
-        spreadsheetId=spreadsheetId, range=range_name,
+        spreadsheetId=SPREADSHEET_ID, range=range_name,
         valueInputOption='USER_ENTERED', body=body).execute()
     except errors.HttpError as err:
         print("Error when writing to sheet {}, retrying after 30s".format(err))
         sleep(30)
-        write_to_sheet(myScore,oppScore,current_time,usOnline,oppOnline)
+        write_to_sheet(values)
         
-
-    
-
 def main():
-    write_to_sheet(100, 99, '01:02:03', 3, 4)
+
+    setup('1qq6UQKyZ6orVo1Hk0agFslvW25kOzPCg88APIpHqCcM')
+
+    values = [
+        [
+            100, 99, '01:02:03'
+        ]
+    ]
+    write_to_sheet(values, 'Day2!G:H')
 
 if __name__ == '__main__':
     main()
