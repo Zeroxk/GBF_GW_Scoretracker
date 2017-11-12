@@ -79,7 +79,7 @@ def main():
         googlesheets.write_to_sheet(values, config['sheet_range_name'])
 
         driver.get(GW_HOME_URL)
-        sleep(int(refreshInterval)
+        sleep(int(refreshInterval))
         now = datetime.now(jst)
         driver.refresh()
 
