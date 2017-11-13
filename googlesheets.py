@@ -70,7 +70,7 @@ def write_to_sheet(values, ranges):
     except errors.HttpError as err:
         print("Error when writing to sheet {}, retrying after 30s".format(err))
         sleep(30)
-        write_to_sheet(values)
+        write_to_sheet(values, ranges)
         
 def main():
 
