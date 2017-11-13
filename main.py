@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
+
 from datetime import datetime
 from time import sleep
 import googlesheets
@@ -57,11 +58,11 @@ def main():
     googlesheets.setup(config['spreadsheetID'])
 
     now = datetime.now(jst)
-    refreshInterval = config['refresh_interval']
+    refreshInterval = int(config['refresh_interval'])
 
     while now.hour > end.hour and now.hour >= start.hour:
-        myScore = driver.find_element_by_class_name('txt-guild-point').text.replace(',','')
-        oppScore = driver.find_element_by_class_name('txt-rival-point').text.replace(',','')
+        myScore = int( driver.find_element_by_class_name('txt-guild-point').text.replace(',','') )
+        oppScore = int( driver.find_element_by_class_name('txt-rival-point').text.replace(',','') )
 
         usOnline = findRecentlyActivePlayers(myGuildID)
         oppOnline = findRecentlyActivePlayers(oppGuildID)
@@ -72,14 +73,14 @@ def main():
 
         values = [
             [
-                now.strftime('%H:%M:%S'), int(myScore), int(oppScore), usOnline, oppOnline
+                now.strftime('%H:%M:%S'), myScore, oppScore, usOnline, oppOnline
             ]
         ]
 
         googlesheets.write_to_sheet(values, config['sheet_range_name'])
 
         driver.get(GW_HOME_URL)
-        sleep(int(refreshInterval))
+        sleep(refreshInterval)
         now = datetime.now(jst)
         driver.refresh()
 
