@@ -60,6 +60,11 @@ def main():
     now = datetime.now(jst)
     refreshInterval = int(config['refresh_interval'])
 
+    while now.hour < start.hour:
+        print("It's too early to start la, let me sleep for a minute more")
+        sleep(60)
+        now = datetime.now(jst)
+
     while now.hour > end.hour and now.hour >= start.hour:
         myScore = int( driver.find_element_by_class_name('txt-guild-point').text.replace(',','') )
         oppScore = int( driver.find_element_by_class_name('txt-rival-point').text.replace(',','') )
