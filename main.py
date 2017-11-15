@@ -24,6 +24,10 @@ def findRecentlyActivePlayers(guildID):
     except Exception as err:
         print("Error when trying to find recently active players {}".format(err))
     
+#TODO
+def get_final_score():
+    return
+
 def main():
 
     '''Setup'''
