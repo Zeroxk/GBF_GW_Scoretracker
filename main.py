@@ -66,8 +66,17 @@ def main():
         now = datetime.now(jst)
 
     while now.hour > end.hour and now.hour >= start.hour:
-        myScore = int( driver.find_element_by_class_name('txt-guild-point').text.replace(',','') )
-        oppScore = int( driver.find_element_by_class_name('txt-rival-point').text.replace(',','') )
+
+        driver.refresh()
+        myScore = WebDriverWait(driver, 10).until(
+            expected_conditions.visibility_of_element_located((By.CLASS_NAME,'txt-guild-point')) 
+        )
+        myScore = int( myScore.text.replace(',','') )
+
+        oppScore = WebDriverWait(driver, 10).until(
+            expected_conditions.visibility_of_element_located((By.CLASS_NAME,'txt-rival-point')) 
+        )
+        oppScore = int( oppScore.text.replace(',','') )
 
         usOnline = findRecentlyActivePlayers(myGuildID)
         oppOnline = findRecentlyActivePlayers(oppGuildID)
@@ -87,7 +96,8 @@ def main():
         driver.get(GW_HOME_URL)
         sleep(refreshInterval)
         now = datetime.now(jst)
-        driver.refresh()
+
+    get_final_score()
 
 if __name__ == '__main__':
     try:
