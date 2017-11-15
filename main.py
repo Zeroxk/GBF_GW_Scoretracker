@@ -25,7 +25,7 @@ def findRecentlyActivePlayers(guildID):
         print("Error when trying to find recently active players {}".format(err))
     
 #TODO
-def get_final_score():
+def get_final_score(guildID, range_name):
     return
 
 def main():
@@ -101,7 +101,7 @@ def main():
         sleep(refreshInterval)
         now = datetime.now(jst)
 
-    get_final_score()
+    get_final_score(oppGuildID, config['sheet_range_name'])
 
 if __name__ == '__main__':
     try:
