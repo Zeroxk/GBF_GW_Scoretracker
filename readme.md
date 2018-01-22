@@ -20,3 +20,4 @@ Steps to create a new profile with account credentials:
 - [ ] Create setup.py
 - [ ] Fetch final score
 - [X] Strike time check
+- [ ] Find a way to set values in discontinous cells per row? i.e A,B,C uploaded vals, D,E formulas, F,G uploaded vals again
