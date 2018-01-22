@@ -19,4 +19,4 @@ Steps to create a new profile with account credentials:
 - [ ] Logging
 - [ ] Create setup.py
 - [ ] Fetch final score
-- [ ] Strike time check
+- [X] Strike time check
