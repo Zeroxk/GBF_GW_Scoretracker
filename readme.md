@@ -11,10 +11,12 @@ Steps to create a new profile with account credentials:
 3. Type "chrome://version" in address bar
 4. Copy "Profile Path" without "Default" at the end
 5. Paste path into "profile_dir" in config.json
-6. Remember to escape separators
+6. Remember to escape separators if needed
 
 # TODO
-1. Error handling
-2. Autogenerate sheets for each day with formatting (Not sure if API supports this)
-3. Logging
-4. Create setup.py
+-[] Error handling
+-[] Autogenerate sheets for each day with formatting (Not sure if API supports this)
+-[] Logging
+-[] Create setup.py
+-[] Fetch final score
+-[] Strike time check
