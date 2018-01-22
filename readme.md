@@ -14,9 +14,9 @@ Steps to create a new profile with account credentials:
 6. Remember to escape separators if needed
 
 # TODO
--[] Error handling
--[] Autogenerate sheets for each day with formatting (Not sure if API supports this)
--[] Logging
--[] Create setup.py
--[] Fetch final score
--[] Strike time check
+- [ ] Error handling
+- [ ] Autogenerate sheets for each day with formatting (Not sure if API supports this)
+- [ ] Logging
+- [ ] Create setup.py
+- [ ] Fetch final score
+- [ ] Strike time check
