@@ -9,11 +9,13 @@ from time import sleep
 import googlesheets
 import pytz
 import json
+import logging
 
 def findRecentlyActivePlayers(guildID):
 
     try:
         driver.get('{}#guild/detail/{}'.format(GBF_URL,guildID) )
+       
         elements = WebDriverWait(driver, 10).until(
             expected_conditions.visibility_of_all_elements_located((By.CLASS_NAME,'prt-status-container')) 
         )
@@ -23,16 +25,51 @@ def findRecentlyActivePlayers(guildID):
 
     except Exception as err:
         print("Error when trying to find recently active players {}".format(err))
-    
-#TODO
-def get_final_score(guildID, range_name):
-    return
+
+def find_scores():
+
+    myScore = find_score('txt-guild-point')
+    oppScore = find_score('txt-rival-point')
+
+    scores = [myScore,oppScore]
+
+    return scores
+
+def find_score(class_name):
+
+    score = WebDriverWait(driver, 10).until(
+                expected_conditions.visibility_of_element_located((By.CLASS_NAME,class_name)) 
+            ).text
+    score = int( score.replace(',','') ) if ',' in score else int(score) #Score with decimals is during a battle, without is from battle records
+
+    return score
+
+def is_strike_time():
+    return driver.find_elements_by_class_name('img-rival-assault') == True
+
+def get_values(now, myGuildID, oppGuildID):
+
+    values = [now.strftime('%H:%M:%S')]
+
+    scores = find_scores()
+    values += scores
+
+    usOnline = findRecentlyActivePlayers(myGuildID)
+    oppOnline = findRecentlyActivePlayers(oppGuildID)
+    values += [usOnline, oppOnline]
+
+    print('myScore: {}\toppScore: {}\tusOnline: {}\toppOnline: {}'.format(values[1], values[2], values[3], values[4]))           
+    print('Current time: {}'.format(now.time()) )
+
+    return [values]
 
 def main():
 
     '''Setup'''
     with open('config.json') as f:
         config = json.load(f)
+
+    logging.basicConfig(filename='main{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
 
     options = webdriver.ChromeOptions()
     profile_dir = config['profile_dir']
@@ -60,6 +97,7 @@ def main():
     end = datetime.now(jst).replace(hour=0, minute=0, second=0)
     
     googlesheets.setup(config['spreadsheetID'])
+    sheet_range = config['sheet_range_name']
 
     now = datetime.now(jst)
     refreshInterval = int(config['refresh_interval'])
@@ -70,38 +108,32 @@ def main():
         now = datetime.now(jst)
 
     while now.hour > end.hour and now.hour >= start.hour:
-
-        driver.refresh()
-        myScore = WebDriverWait(driver, 10).until(
-            expected_conditions.visibility_of_element_located((By.CLASS_NAME,'txt-guild-point')) 
-        )
-        myScore = int( myScore.text.replace(',','') )
-
-        oppScore = WebDriverWait(driver, 10).until(
-            expected_conditions.visibility_of_element_located((By.CLASS_NAME,'txt-rival-point')) 
-        )
-        oppScore = int( oppScore.text.replace(',','') )
-
-        usOnline = findRecentlyActivePlayers(myGuildID)
-        oppOnline = findRecentlyActivePlayers(oppGuildID)
-
-        print('myScore: {}\toppScore: {}\tusOnline: {}\toppOnline: {}'.format(myScore,oppScore,usOnline,oppOnline))
         
-        print('Current time: {}'.format(now.time()) )
+        try:
 
-        values = [
-            [
-                now.strftime('%H:%M:%S'), myScore, oppScore, usOnline, oppOnline
-            ]
-        ]
+            driver.refresh()
+            print("Is it strike time? " + str(is_strike_time()) )
+            values = get_values(now,myGuildID,oppGuildID)
+            googlesheets.write_to_sheet(values, sheet_range)
 
-        googlesheets.write_to_sheet(values, config['sheet_range_name'])
+            driver.get(GW_HOME_URL)
+            sleep(refreshInterval)
+            now = datetime.now(jst)
 
-        driver.get(GW_HOME_URL)
-        sleep(refreshInterval)
-        now = datetime.now(jst)
+        except Exception as ex:
+            logging.exception()
+            continue
+            
+        
 
-    get_final_score(oppGuildID, config['sheet_range_name'])
+    #Wait until result screen for final score
+    #TODO: Find better way to detect when battle result is ready, perhaps check non-availability of raid buttons
+    if 'battle_result' not in driver.current_url:
+        sleep(1800)
+        driver.refresh()
+
+    values = get_values(now,myGuildID,oppGuildID)
+    googlesheets.write_to_sheet(values, sheet_range)
 
 if __name__ == '__main__':
     try:
