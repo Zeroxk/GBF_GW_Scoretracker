@@ -45,7 +45,7 @@ def find_score(class_name):
     return score
 
 def is_strike_time():
-    return driver.find_elements_by_class_name('img-rival-assault') == True
+    return driver.find_elements_by_class_name('img-rival-assault') != []
 
 def get_values(now, myGuildID, oppGuildID):
 
@@ -132,6 +132,7 @@ def main():
         sleep(1800)
         driver.refresh()
 
+    driver.refresh()
     values = get_values(now,myGuildID,oppGuildID)
     googlesheets.write_to_sheet(values, sheet_range)
 
