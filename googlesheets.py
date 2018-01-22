@@ -74,14 +74,14 @@ def write_to_sheet(values, ranges):
         
 def main():
 
-    setup('1qq6UQKyZ6orVo1Hk0agFslvW25kOzPCg88APIpHqCcM')
+    setup('1ZFcc8xSPOuM2epcevbfAMSVWQb3CFIGNpxHhH4v5jjc')
 
     values = [
         [
             100, 99, '01:02:03'
         ]
     ]
-    write_to_sheet(values, 'Day2!G:H')
+    write_to_sheet(values, 'Day1!A:C')
 
 if __name__ == '__main__':
     main()
