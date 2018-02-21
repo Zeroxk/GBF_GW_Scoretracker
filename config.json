@@ -1,10 +1,10 @@
 {
     "gbf_url": "http://game.granbluefantasy.jp/",
-    "gw_partial_url": "#event/teamraid034",
-    "myGuildID": "147448",
-    "oppGuildID": "1153977",
-    "spreadsheetID": "1qq6UQKyZ6orVo1Hk0agFslvW25kOzPCg88APIpHqCcM",
-    "sheet_range_name": "Day2!A:C",
-    "refresh_interval": "480",
-    "profile_dir": "C:\\Users\\DVD\\AppData\\Local\\Temp\\scoped_dir28772_22973"
+    "gw_partial_url": "#event/teamraid036",
+    "myGuildID": "1234",
+    "oppGuildID": "23456",
+    "spreadsheetID": "asdf",
+    "sheet_range_name": "Day1!A:C",
+    "refresh_interval": "600",
+    "profile_dir": "C:\\TestFolder"
 }
