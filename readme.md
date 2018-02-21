@@ -19,6 +19,7 @@ Steps to create a new profile with account credentials:
 6. Remember to escape separators if needed
 
 # TODO
+- [ ] Move all these TODOs to issues
 - [ ] Better error handling
 - [ ] Autogenerate sheets for each day with formatting (Not sure if API supports this)
 - [ ] Better Logging
