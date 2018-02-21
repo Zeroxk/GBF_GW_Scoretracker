@@ -10,6 +10,12 @@ import googlesheets
 import pytz
 import json
 import logging
+import argparse
+
+parser = argparse.ArgumentParser()  
+parser.add_argument('-c', '--configFile', help='Sets config filename', default='config.json')
+
+args = parser.parse_args()
 
 def findRecentlyActivePlayers(guildID):
 
@@ -63,10 +69,13 @@ def get_values(now, myGuildID, oppGuildID):
 
     return [values]
 
-def main():
+def main(args):
 
     '''Setup'''
-    with open('config.json') as f:
+    
+    configFilename = args.configFile
+
+    with open(configFilename) as f:
         config = json.load(f)
 
     logging.basicConfig(filename='main{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
@@ -121,24 +130,31 @@ def main():
             now = datetime.now(jst)
 
         except Exception as ex:
-            logging.exception()
+            print(e)
             continue
             
         
 
     #Wait until result screen for final score
-    #TODO: Find better way to detect when battle result is ready, perhaps check non-availability of raid buttons
+    #TODO: Find better way to detect when battle result is ready, perhaps check for greyed out raid boxes
     if 'battle_result' not in driver.current_url:
-        sleep(1800)
+        #sleep(1800)
         driver.refresh()
 
-    driver.refresh()
+    #Find final score for most recent round
+    driver.get(GW_HOME_URL)
+    crewTab = driver.find_element_by_id((By.ID, 'tab-record'))
+    driver.execute_script('arguments[0].scrollIntoView(true)', crewTab)
+    crewTab.click()
+    
+    v = driver.find_elements_by_class_name('txt-guild-point')
     values = get_values(now,myGuildID,oppGuildID)
     googlesheets.write_to_sheet(values, sheet_range)
 
 if __name__ == '__main__':
     try:
-        main()
-    except Exception:
-        print(Exception)
+        
+        main(args)
+    except Exception as e:
+        print(e)
         raise
