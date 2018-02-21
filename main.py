@@ -12,11 +12,6 @@ import json
 import logging
 import argparse
 
-parser = argparse.ArgumentParser()  
-parser.add_argument('-c', '--configFile', help='Sets config filename', default='config.json')
-
-args = parser.parse_args()
-
 def findRecentlyActivePlayers(guildID):
 
     try:
@@ -78,7 +73,6 @@ def main(args):
     with open(configFilename) as f:
         config = json.load(f)
 
-    logging.basicConfig(filename='main{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
 
     options = webdriver.ChromeOptions()
     profile_dir = config['profile_dir']
@@ -152,8 +146,14 @@ def main(args):
     googlesheets.write_to_sheet(values, sheet_range)
 
 if __name__ == '__main__':
+
+    logging.basicConfig(filename='main{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
+
     try:
-        
+        parser = argparse.ArgumentParser(parents=[googlesheets.tools.argparser])
+        parser.add_argument('-c', '--configFile', help='Sets config filename', default='config.json')
+
+        args = parser.parse_args()
         main(args)
     except Exception as e:
         print(e)

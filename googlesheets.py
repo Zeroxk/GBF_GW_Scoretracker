@@ -8,12 +8,6 @@ from oauth2client import tools
 from oauth2client.file import Storage
 from time import sleep
 
-try:
-    import argparse
-    flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-except ImportError:
-    flags = None
-
 SCOPES = 'https://www.googleapis.com/auth/spreadsheets'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Gbf-gw-scoretracker'
@@ -27,6 +21,14 @@ def get_credentials():
     Returns:
         Credentials, the obtained credential.
     """
+
+    try:
+        import argparse
+        parser = argparse.ArgumentParser(parents=[tools.argparser])
+        flags, extras = parser.parse_known_args()
+    except ImportError:
+        flags = None
+
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
@@ -45,6 +47,7 @@ def get_credentials():
     return credentials
 
 def setup(spreadsheetId):
+
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     discoveryUrl = ('https://sheets.googleapis.com/$discovery/rest?'
