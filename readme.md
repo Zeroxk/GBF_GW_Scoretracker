@@ -1,6 +1,6 @@
 # Dependencies
-Selenium
-Pytz
+Selenium\
+Pytz\
 Google-api-python-client
 
 # Linux install
