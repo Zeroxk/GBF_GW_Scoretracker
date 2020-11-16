@@ -1,7 +1,10 @@
-# Dependencies
-Selenium\
-Pytz\
-Google-api-python-client
+# Setup virtualenv and install dependencies
+```
+pip install virtualenv
+virtualenv scoretracker
+scoretracker\Scripts\activate
+pip install -r requirements.txt
+```
 
 # Linux install
 1. Symlink chromium with chrome, ln -s /usr/bin/chromium-browser /etc/alternatives/google-chrome
@@ -17,14 +20,3 @@ Steps to create a new profile with account credentials:
 4. Copy "Profile Path" without "Default" at the end
 5. Paste path into "profile_dir" in config.json
 6. Remember to escape separators if needed
-
-# TODO
-- [ ] Move all these TODOs to issues
-- [ ] Better error handling
-- [ ] Autogenerate sheets for each day with formatting (Not sure if API supports this)
-- [ ] Better Logging
-- [ ] Create setup.py
-- [ ] Fetch final score
-- [ ] Find a way to set values in discontinous cells per row? i.e A,B,C uploaded vals, D,E formulas, F,G uploaded vals again
-- [ ] More accurate timer
-- [ ] Accept configfilename as cmdline argument
