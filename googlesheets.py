@@ -74,6 +74,30 @@ def write_to_sheet(values, ranges):
         print("Error when writing to sheet {}, retrying after 30s".format(err))
         sleep(30)
         write_to_sheet(values, ranges)
+
+def get_spreadSheets():
+    return service.spreadsheets().get(spreadsheetId=SPREADSHEET_ID, ranges=None, includeGridData=None).execute()
+
+def get_worksheets():
+    spreadSheet = get_spreadSheets()
+    return spreadSheet["sheets"]
+
+def worksheet_exists(worksheetName):
+    worksheets = get_worksheets()
+
+    for worksheet in worksheets:
+        if worksheet["properties"]["title"] == worksheetName:
+            return True
+
+    return False
+
+def create_new_worksheet(worksheetName):
+    body = {
+        ""
+    }
+    service.spreadsheets().batchUpdate(spreadsheetId=SPREADSHEET_ID, body=body).execute()
+    return None
+
         
 def main():
 
@@ -84,6 +108,7 @@ def main():
             100, 99, '01:02:03'
         ]
     ]
+    worksheet_exists("Day1")
     write_to_sheet(values, 'Day1!A:C')
 
 if __name__ == '__main__':
