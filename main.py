@@ -6,6 +6,7 @@ from selenium.webdriver.support import expected_conditions
 
 from datetime import datetime
 from time import sleep
+from time import time as unixTime
 import googlesheets
 import pytz
 import json
@@ -37,20 +38,28 @@ def find_scores():
     return scores
 
 def find_score(class_name):
-
-    score = WebDriverWait(driver, 10).until(
+    try:
+        score = WebDriverWait(driver, 10).until(
                 expected_conditions.visibility_of_element_located((By.CLASS_NAME,class_name)) 
             ).text
-    score = int( score.replace(',','') ) if ',' in score else int(score) #Score with decimals is during a battle, without is from battle records
+        score = int( score.replace(',','') ) if ',' in score else int(score) #Score with decimals is during a battle, without is from battle records
 
-    return score
+        return score
+    except Exception as err:
+        print("Error when trying to find score {}".format(err))
+    
 
 def is_strike_time():
-    return driver.find_elements_by_class_name('img-rival-assault') != []
+    try:
+        strikeTimeElement = driver.find_elements_by_class_name('img-rival-assault')
+        return strikeTimeElement != []
+    except Exception as err:
+        print("Error checking for striketime {}".format(err))
+        
 
-def get_values(now, myGuildID, oppGuildID):
+def get_values(timezone, myGuildID, oppGuildID):
 
-    values = [now.strftime('%H:%M:%S')]
+    values = []
 
     scores = find_scores()
     values += scores
@@ -58,11 +67,30 @@ def get_values(now, myGuildID, oppGuildID):
     usOnline = findRecentlyActivePlayers(myGuildID)
     oppOnline = findRecentlyActivePlayers(oppGuildID)
     values += [usOnline, oppOnline]
+    values = [datetime.now(timezone).strftime('%H:%M:%S')] + values
 
     print('myScore: {}\toppScore: {}\tusOnline: {}\toppOnline: {}'.format(values[1], values[2], values[3], values[4]))           
-    print('Current time: {}'.format(now.time()) )
+    print('Current time: {}'.format(values[0]) )
 
     return [values]
+
+def findSecondsToNextInterval(refreshInterval, timezone):
+    now = datetime.now(timezone)
+    minutesInSeconds = now.minute % refreshInterval
+
+    if minutesInSeconds != 0:
+        minutesInSeconds = (refreshInterval - minutesInSeconds) * 60
+    else:
+        minutesInSeconds = 60
+
+    seconds = 60 - now.second
+    
+    return minutesInSeconds + seconds
+
+def findSecondsToNextIntervalWithUnixTime(unixTimeStart, refreshInterval, timezone):
+    intervalInSeconds = 60 if refreshInterval == 0 else refreshInterval * 60
+    
+    return intervalInSeconds - (unixTime() - unixTimeStart % intervalInSeconds)
 
 def main(args):
 
@@ -110,21 +138,25 @@ def main(args):
         sleep(60)
         now = datetime.now(jst)
 
+    unixTimeStart = unixTime()
+
     while now.hour > end.hour and now.hour >= start.hour:
         
         try:
 
             driver.refresh()
             print("Is it strike time? " + str(is_strike_time()) )
-            values = get_values(now,myGuildID,oppGuildID)
+            values = get_values(jst,myGuildID,oppGuildID)
             googlesheets.write_to_sheet(values, sheet_range)
 
             driver.get(GW_HOME_URL)
+            secondsToNextInterval = findSecondsToNextIntervalWithUnixTime(unixTimeStart, refreshInterval, jst)
+            print("Sleep for {} seconds".format(secondsToNextInterval))
             sleep(refreshInterval)
             now = datetime.now(jst)
 
         except Exception as ex:
-            print(e)
+            print(repr(ex))
             continue
             
         
@@ -147,7 +179,7 @@ def main(args):
 
 if __name__ == '__main__':
 
-    logging.basicConfig(filename='main{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
+    logging.basicConfig(filename='main_{}.log'.format(datetime.now().strftime('%d.%m.%Y')),level=logging.ERROR)
 
     try:
         parser = argparse.ArgumentParser(parents=[googlesheets.tools.argparser])
@@ -155,6 +187,6 @@ if __name__ == '__main__':
 
         args = parser.parse_args()
         main(args)
-    except Exception as e:
-        print(e)
+    except Exception as ex:
+        print(ex)
         raise
