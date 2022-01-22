@@ -12,6 +12,7 @@ import pytz
 import json
 import logging
 import argparse
+import chromedriver_binary #Auto-imports binary and adds to PATH
 
 def findRecentlyActivePlayers(guildID):
 
@@ -100,8 +101,7 @@ def main(args):
 
     with open(configFilename) as f:
         config = json.load(f)
-
-
+    
     options = webdriver.ChromeOptions()
     profile_dir = config['profile_dir']
     if profile_dir != '':
