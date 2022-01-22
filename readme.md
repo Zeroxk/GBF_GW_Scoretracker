@@ -8,8 +8,11 @@ pip install -r requirements.txt
 
 # Linux install
 1. Symlink chromium with chrome, ln -s /usr/bin/chromium-browser /etc/alternatives/google-chrome
-2. If on raspberry pi, install chromedriver from https://launchpad.net/ubuntu/trusty/+package/chromium-chromedriver (armhf builds)
-copy from /usr/lib/chromium-browser/chromedriver to /usr/local/bin or export to PATH if necessary
+2. Install package(might not be available depending on distro)
+```
+sudo apt-get install chromium-chromedriver
+```
+3. Copy from /usr/lib/chromium-browser/chromedriver to /usr/local/bin or export to PATH if necessary
 
 # Using existing/creating new profile
 Put chrome profile full path in config.json under key "profile_dir", login to your account if necessary.\
