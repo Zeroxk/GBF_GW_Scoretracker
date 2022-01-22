@@ -2,3 +2,5 @@ client_secret.json
 .vscode
 _pycache_
 *Profile/
+main*
+config*
