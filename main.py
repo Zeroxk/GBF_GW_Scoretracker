@@ -1,3 +1,4 @@
+import string
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
@@ -13,8 +14,9 @@ import json
 import logging
 import argparse
 import chromedriver_binary #Auto-imports binary and adds to PATH
+import typing
 
-def findRecentlyActivePlayers(guildID):
+def findRecentlyActivePlayers(guildID: int) -> int:
 
     try:
         driver.get('{}#guild/detail/{}'.format(GBF_URL,guildID) )
@@ -29,7 +31,7 @@ def findRecentlyActivePlayers(guildID):
     except Exception as err:
         print("Error when trying to find recently active players {}".format(err))
 
-def find_scores():
+def find_scores() -> list[int]:
 
     myScore = find_score('txt-guild-point')
     oppScore = find_score('txt-rival-point')
@@ -38,7 +40,7 @@ def find_scores():
 
     return scores
 
-def find_score(class_name):
+def find_score(class_name: string) -> int:
     try:
         score = WebDriverWait(driver, 10).until(
                 expected_conditions.visibility_of_element_located((By.CLASS_NAME,class_name)) 
@@ -50,7 +52,7 @@ def find_score(class_name):
         print("Error when trying to find score {}".format(err))
     
 
-def is_strike_time():
+def is_strike_time() -> bool:
     try:
         strikeTimeElement = driver.find_elements_by_class_name('img-rival-assault')
         return strikeTimeElement != []
@@ -88,7 +90,7 @@ def findSecondsToNextInterval(refreshInterval, timezone):
     
     return minutesInSeconds + seconds
 
-def findSecondsToNextIntervalWithUnixTime(unixTimeStart, refreshInterval, timezone):
+def findSecondsToNextIntervalWithUnixTime(unixTimeStart: int, refreshInterval: int, timezone):
     intervalInSeconds = 60 if refreshInterval == 0 else refreshInterval * 60
     
     return intervalInSeconds - (unixTime() - unixTimeStart % intervalInSeconds)
@@ -103,6 +105,8 @@ def main(args):
         config = json.load(f)
     
     options = webdriver.ChromeOptions()
+    options.set_headless = True
+    
     profile_dir = config['profile_dir']
     if profile_dir != '':
         options.add_argument('user-data-dir={}'.format(profile_dir))
