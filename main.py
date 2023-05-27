@@ -5,7 +5,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions
 
-from datetime import _TzInfo, datetime
+from datetime import datetime, timedelta
 from time import sleep
 from time import time as unixTime
 import googlesheets
@@ -60,7 +60,7 @@ def is_strike_time() -> bool:
         print("Error checking for striketime {}".format(err))
         
 
-def get_values(timezone: _TzInfo, myGuildID: int, oppGuildID: int) -> list[str]:
+def get_values(now: datetime, myGuildID: int, oppGuildID: int) -> list[str]:
 
     values = []
 
@@ -70,30 +70,18 @@ def get_values(timezone: _TzInfo, myGuildID: int, oppGuildID: int) -> list[str]:
     usOnline = findRecentlyActivePlayers(myGuildID)
     oppOnline = findRecentlyActivePlayers(oppGuildID)
     values += [usOnline, oppOnline]
-    values = [datetime.now(timezone).strftime('%H:%M:%S')] + values
+    values = [now.strftime('%H:%M:%S')] + values
 
     print('myScore: {}\toppScore: {}\tusOnline: {}\toppOnline: {}'.format(values[1], values[2], values[3], values[4]))           
     print('Current time: {}'.format(values[0]) )
 
     return [values]
 
-def findSecondsToNextInterval(refreshInterval: int, timezone: _TzInfo) -> int:
-    now = datetime.now(timezone)
-    minutesInSeconds = now.minute % refreshInterval
+def findSecondsToNextInterval(refreshInterval: int, timezone) -> float:
+    now = datetime.now()
+    next: datetime = now + (datetime.min - now) % timedelta(minutes=refreshInterval)
 
-    if minutesInSeconds != 0:
-        minutesInSeconds = (refreshInterval - minutesInSeconds) * 60
-    else:
-        minutesInSeconds = 60
-
-    seconds = 60 - now.second
-    
-    return minutesInSeconds + seconds
-
-def findSecondsToNextIntervalWithUnixTime(unixTimeStart: int, refreshInterval: int, timezone) -> int:
-    intervalInSeconds = 60 if refreshInterval == 0 else refreshInterval * 60
-    
-    return intervalInSeconds - (unixTime() - unixTimeStart % intervalInSeconds)
+    return next.timestamp() - now.timestamp()
 
 def main(args):
 
@@ -115,7 +103,7 @@ def main(args):
     global GBF_URL
     driver = webdriver.Chrome(chrome_options=options)
     driver.implicitly_wait(5)
-    GBF_URL: str = config['gbf_url']
+    GBF_URL = config['gbf_url']
     GW_HOME_URL: str = GBF_URL + config['gw_partial_url']
     myGuildID: int = config['myGuildID']
     oppGuildID: int = config['oppGuildID']
@@ -150,13 +138,13 @@ def main(args):
 
             driver.refresh()
             print(f'Is it strike time? {is_strike_time()}')
-            values = get_values(jst,myGuildID,oppGuildID)
+            values = get_values(now,myGuildID,oppGuildID)
             googlesheets.write_to_sheet(values, sheet_range)
 
             driver.get(GW_HOME_URL)
-            secondsToNextInterval = findSecondsToNextIntervalWithUnixTime(unixTimeStart, refreshInterval, jst)
+            secondsToNextInterval = findSecondsToNextInterval(refreshInterval, jst)
             print("Sleep for {} seconds".format(secondsToNextInterval))
-            sleep(refreshInterval)
+            sleep(secondsToNextInterval)
             now = datetime.now(jst)
 
         except Exception as ex:
