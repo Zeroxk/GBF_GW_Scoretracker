@@ -1,3 +1,4 @@
+from random import Random
 import string
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
@@ -78,10 +79,12 @@ def get_values(now: datetime, myGuildID: int, oppGuildID: int) -> list[str]:
     return [values]
 
 def findSecondsToNextInterval(refreshInterval: int, timezone) -> float:
+    refreshIntervalAsSeconds = refreshInterval * 60
     now = datetime.now()
-    next: datetime = now + (datetime.min - now) % timedelta(minutes=refreshInterval)
-
-    return next.timestamp() - now.timestamp()
+    next: datetime = now + (datetime.min - now) % timedelta(seconds=refreshIntervalAsSeconds)
+    
+    sovl = Random().randrange(start = 0, stop = 60)
+    return (next.timestamp() - now.timestamp()) + sovl
 
 def main(args):
 
@@ -116,8 +119,10 @@ def main(args):
     driver.get(GW_HOME_URL)
 
     jst = pytz.timezone('Asia/Tokyo')
+    # GW starts at 07:00
     start = datetime.now(jst).replace(hour=7, minute=0, second=0)
-    end = datetime.now(jst).replace(hour=0, minute=0, second=0)
+    # and ends at 00:00 the following day
+    end = datetime.now(jst).replace(hour=0, minute=0, second=0) + timedelta(days=1)
     
     googlesheets.setup(config['spreadsheetID'])
     sheet_range: str = config['sheet_range_name']
@@ -132,7 +137,7 @@ def main(args):
 
     unixTimeStart = unixTime()
 
-    while now.hour > end.hour and now.hour >= start.hour:
+    while start <= now <= end:
         
         try:
 

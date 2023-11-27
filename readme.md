@@ -6,6 +6,9 @@ scoretracker\Scripts\activate
 pip install -r requirements.txt
 ```
 
+# How to run
+`python main.py -c <configFile>`
+
 # Linux install
 1. Symlink chromium with chrome, ln -s /usr/bin/chromium-browser /etc/alternatives/google-chrome
 2. Install package(might not be available depending on distro)
